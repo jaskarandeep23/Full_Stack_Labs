@@ -1,4 +1,4 @@
-// array of employees to be displayed on the page
+// Different array of employees to be displayed on the page 
 const employees = [
     {
         firstName: "Zoë",
@@ -35,7 +35,7 @@ const populateEmployeeList = (mainNode, employees) => {
     mainNode.appendChild(departmentSection);
 };
 
-// add event listener when the DOM has loaded fully
+// Adding event listener when the DOM has loaded fully
 document.addEventListener("DOMContentLoaded", () => {
 
     const mainNode = document.querySelector("main");
