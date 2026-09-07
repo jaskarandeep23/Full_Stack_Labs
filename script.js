@@ -1,44 +1,76 @@
-// Different array of employees to be displayed on the page 
-const employees = [
+// array of departments and employees to be displayed on the page
+const departments = [
     {
-        firstName: "Zoë",
-        lastName: "Robins",
-        department: "Administration"
-    },
-    {
-        firstName: "Madeleine",
-        lastName: "Madden",
-        department: "Administration"
+        name: "Administration",
+        employees: [
+            {
+                firstName: "Zoë",
+                lastName: "Robins"
+            },
+            {
+                firstName: "Madeleine",
+                lastName: "Madden"
+            }
+        ]
     }
 ];
 
-const populateEmployeeList = (mainNode, employees) => {
 
-    const departmentSection = document.createElement("section");
+// function to display departments and employees
+const populateEmployeeList = (mainNode, departments) => {
 
-    const departmentHeading = document.createElement("h2");
-    departmentHeading.innerHTML = "Adminstration";
+    // iterate over departments array
+    departments.forEach(department => {
 
-    departmentSection.appendChild(departmentHeading);
+        // create department section
+        const departmentSection = document.createElement("section");
 
-    const employeeList = document.createElement("ul");
-    departmentSection.appendChild(employeeList);
+        // create department heading
+        const departmentHeading = document.createElement("h2");
 
-     employees.forEach(employee => {
-        const employeeLi = document.createElement("li");
+        // add department name to heading
+        departmentHeading.innerHTML = department.name;
 
-        employeeLi.innerHTML = `${employee.firstName} ${employee.lastName}`;
+        // append heading to department section
+        departmentSection.appendChild(departmentHeading);
 
-        employeeList.appendChild(employeeLi);
+        // create employee list
+        const employeeList = document.createElement("ul");
+
+        // iterate over employees in the department
+        department.employees.forEach(employee => {
+
+            // create new list item
+            const employeeLi = document.createElement("li");
+
+            // add employee name to list item
+            employeeLi.innerHTML = `${employee.firstName} ${employee.lastName}`;
+
+            // append employee to list
+            employeeList.appendChild(employeeLi);
+        });
+
+        // append employee list to department section
+        departmentSection.appendChild(employeeList);
+
+        // append department section to main
+        mainNode.appendChild(departmentSection);
     });
-      
-    mainNode.appendChild(departmentSection);
 };
 
-// Adding event listener when the DOM has loaded fully
+
+// add event listener when the DOM has loaded fully
 document.addEventListener("DOMContentLoaded", () => {
 
+    // store the DOM node referencing the main element
     const mainNode = document.querySelector("main");
 
-    populateEmployeeList(mainNode, employees);
+    // populate the employee directory
+    populateEmployeeList(mainNode, departments);
+
+    // store the DOM node referencing the current year
+    const currentYearNode = document.querySelector("#current-year");
+
+    // insert the current year into the footer
+    currentYearNode.innerHTML = new Date().getFullYear();
 });
