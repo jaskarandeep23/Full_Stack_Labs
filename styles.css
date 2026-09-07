@@ -1,0 +1,44 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    margin: 0.3em;
+    padding: 0.3em;
+    line-height: 1.6;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+header img {
+    width: 100px;
+    height: auto;
+}
+
+main {
+    background-color: lightgray;
+    max-width: 75%;
+    margin: auto;
+    padding: 1em;
+}
+
+main section {
+    margin-bottom: 1.5em;
+}
+
+h1, h2 {
+    color: #444;
+    margin-bottom: 0.5em;
+}
+
+h2 {
+    font-size: 1em;
+}
+
+footer {
+    text-align: center;
+    margin-top: 2em;
+}
