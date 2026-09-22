@@ -1,0 +1,31 @@
+.organization {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.organization h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.organization-list {
+    background-color: #f1f1f1;
+    padding: 20px;
+}
+
+.organization-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 12px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.organization-row span:first-child {
+    font-weight: bold;
+}
+
+.organization-row span:last-child {
+    text-align: right;
+}

@@ -1,8 +1,9 @@
 import { useState } from "react";
-import Header from "./components/header/Header";
+import { Navigate, Route, Routes } from "react-router-dom";
+import Layout from "./components/layout/Layout";
 import EmployeeDirectory from "./components/employee-directory/EmployeeDirectory";
 import EmployeeForm from "./components/employee-form/EmployeeForm";
-import Footer from "./components/footer/Footer";
+import Organization from "./components/organization/Organization";
 import departmentsData from "./data/employees.json";
 import type { Department } from "./interfaces/Department";
 import type { Employee } from "./interfaces/Employee";
@@ -24,17 +25,32 @@ function App() {
     }
 
     return (
-        <>
-            <Header />
-            <EmployeeDirectory departments={departments} />
+        <Routes>
+            <Route path="/" element={<Layout />}>
+                <Route
+                    index
+                    element={<Navigate to="/employees" replace />}
+                />
 
-            <EmployeeForm
-                departments={departments}
-                onAddEmployee={addEmployee}
-            />
+                <Route
+                    path="employees"
+                    element={
+                        <>
+                            <EmployeeDirectory departments={departments} />
+                            <EmployeeForm
+                                departments={departments}
+                                onAddEmployee={addEmployee}
+                            />
+                        </>
+                    }
+                />
 
-            <Footer />
-        </>
+                <Route
+                    path="organization"
+                    element={<Organization />}
+                />
+            </Route>
+        </Routes>
     );
 }
 
