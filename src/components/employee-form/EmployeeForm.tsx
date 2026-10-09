@@ -1,83 +1,109 @@
-import { useState } from "react";
-import "./EmployeeForm.css";
-import type { Department } from "../../interfaces/Department";
-import type { Employee } from "../../interfaces/Employee";
 
-interface Props {
-    departments: Department[];
-    onAddEmployee: (departmentName: string, employee: Employee) => void;
+import { useState } from "react";
+import type { Department } from "../../interfaces/Department";
+import { useFormInput } from "../../hooks/useFormInput";
+import { employeeService } from "../../services/employeeService";
+import "./EmployeeForm.css";
+
+interface EmployeeFormProps {
+  departments: Department[];
+  onEmployeeAdded: () => void;
 }
 
-function EmployeeForm({ departments, onAddEmployee }: Props) {
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [department, setDepartment] = useState("");
-    const [error, setError] = useState("");
+export default function EmployeeForm({
+  departments,
+  onEmployeeAdded,
+}: EmployeeFormProps) {
+  const firstName = useFormInput("");
+  const lastName = useFormInput("");
+  const department = useFormInput("");
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setError("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-        if (firstName.trim().length < 3) {
-            setError("First name must be at least 3 characters.");
-            return;
-        }
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSuccessMessage("");
 
-        if (department === "") {
-            setError("Please select a department.");
-            return;
-        }
+    const validFirstName = firstName.validate(
+      employeeService.validateFirstName
+    );
 
-        onAddEmployee(department, {
-            firstName: firstName.trim(),
-            lastName: lastName.trim(),
-        });
+    const validDepartment = department.validate(
+      employeeService.validateDepartment
+    );
 
-        setFirstName("");
-        setLastName("");
-        setDepartment("");
+    if (!validFirstName || !validDepartment) {
+      return;
     }
 
-    return (
-        <section className="employee-form">
-            <h2>Add Employee</h2>
+    const result = employeeService.createEmployee(department.value, {
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+    });
 
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="firstName">First Name</label>
-                <input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(event) => setFirstName(event.target.value)}
-                />
+    if (!result.success) {
+      firstName.setError(result.firstNameError);
+      department.setError(result.departmentError);
+      return;
+    }
 
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(event) => setLastName(event.target.value)}
-                />
+    setSuccessMessage("Employee added successfully!");
 
-                <label htmlFor="department">Department</label>
-                <select
-                    id="department"
-                    value={department}
-                    onChange={(event) => setDepartment(event.target.value)}
-                >
-                    <option value="">Select Department</option>
+    firstName.reset();
+    lastName.reset();
+    department.reset();
 
-                    {departments.map((department) => (
-                        <option key={department.name} value={department.name}>
-                            {department.name}
-                        </option>
-                    ))}
-                </select>
+    onEmployeeAdded();
+  };
 
-                {error && <p className="error">{error}</p>}
+  return (
+    <div className="employee-form">
+      <h2>Add New Employee</h2>
 
-                <button type="submit">Add Employee</button>
-            </form>
-        </section>
-    );
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="firstName">First Name:</label>
+          <input
+            id="firstName"
+            type="text"
+            value={firstName.value}
+            onChange={(event) => firstName.setValue(event.target.value)}
+          />
+          {firstName.error && <p className="error">{firstName.error}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="lastName">Last Name:</label>
+          <input
+            id="lastName"
+            type="text"
+            value={lastName.value}
+            onChange={(event) => lastName.setValue(event.target.value)}
+          />
+          {lastName.error && <p className="error">{lastName.error}</p>}
+        </div>
+
+        <div>
+          <label htmlFor="department">Department:</label>
+          <select
+            id="department"
+            value={department.value}
+            onChange={(event) => department.setValue(event.target.value)}
+          >
+            <option value="">Select Department</option>
+            {departments.map((item) => (
+              <option key={item.name} value={item.name}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+          {department.error && <p className="error">{department.error}</p>}
+        </div>
+
+        <button type="submit">Add Employee</button>
+      </form>
+
+      {successMessage && <p>{successMessage}</p>}
+    </div>
+  );
 }
-
-export default EmployeeForm;

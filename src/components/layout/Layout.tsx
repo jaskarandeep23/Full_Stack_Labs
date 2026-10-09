@@ -1,22 +1,32 @@
+
 import { NavLink, Outlet } from "react-router-dom";
 import Header from "../header/Header";
 import Footer from "../footer/Footer";
 
 function Layout() {
-    return (
-        <>
-            <Header />
+  return (
+    <>
+      <Header />
 
-            <nav>
-                <NavLink to="/employees">Employees</NavLink>
-                <NavLink to="/organization">Organization</NavLink>
-            </nav>
+      <nav style={{ display: "flex", gap: "20px", padding: "15px" }}>
+        <NavLink to="/" end>
+          Employees
+        </NavLink>
 
-            <Outlet />
+        <NavLink to="/add-employee">
+          Add Employee
+        </NavLink>
 
-            <Footer />
-        </>
-    );
+        <NavLink to="/organization">
+          Organization
+        </NavLink>
+      </nav>
+
+      <Outlet />
+
+      <Footer />
+    </>
+  );
 }
 
 export default Layout;
