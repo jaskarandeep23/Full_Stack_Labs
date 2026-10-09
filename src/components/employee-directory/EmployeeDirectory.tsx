@@ -1,10 +1,11 @@
 import "./EmployeeDirectory.css";
-import departmentsData from "../../data/employees.json";
 import type { Department } from "../../interfaces/Department";
 
-function EmployeeDirectory() {
-    const departments: Department[] = departmentsData;
+interface Props {
+    departments: Department[];
+}
 
+function EmployeeDirectory({ departments }: Props) {
     return (
         <main>
             {departments.map((department) => (

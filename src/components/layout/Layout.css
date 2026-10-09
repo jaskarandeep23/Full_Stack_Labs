@@ -1,0 +1,20 @@
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #233d55;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 15px;
+}
+
+nav a:hover {
+    background-color: white;
+    color: #233d55;
+}
