@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import type { Department } from "../../interfaces/Department";
 import { useFormInput } from "../../hooks/useFormInput";
@@ -68,7 +69,7 @@ export default function EmployeeForm({
             value={firstName.value}
             onChange={(event) => firstName.setValue(event.target.value)}
           />
-          {firstName.error && <p>{firstName.error}</p>}
+          {firstName.error && <p className="error">{firstName.error}</p>}
         </div>
 
         <div>
@@ -79,7 +80,7 @@ export default function EmployeeForm({
             value={lastName.value}
             onChange={(event) => lastName.setValue(event.target.value)}
           />
-          {lastName.error && <p>{lastName.error}</p>}
+          {lastName.error && <p className="error">{lastName.error}</p>}
         </div>
 
         <div>
@@ -96,7 +97,7 @@ export default function EmployeeForm({
               </option>
             ))}
           </select>
-          {department.error && <p>{department.error}</p>}
+          {department.error && <p className="error">{department.error}</p>}
         </div>
 
         <button type="submit">Add Employee</button>
