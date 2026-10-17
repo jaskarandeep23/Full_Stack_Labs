@@ -1,30 +1,42 @@
+
+import { useState } from "react";
 import "./Organization.css";
-import rolesData from "../../data/roles.json";
+
 import type { Role } from "../../interfaces/Role";
+import { roleService } from "../../services/roleService";
+import RoleForm from "../role-form/RoleForm";
 
 function Organization() {
-    const roles: Role[] = rolesData;
+  const [roles, setRoles] = useState<Role[]>(() =>
+    roleService.getRoles()
+  );
 
-    return (
-        <main className="organization">
-            <h2>Organization</h2>
+  const loadRoles = () => {
+    setRoles(roleService.getRoles());
+  };
 
-            <div className="organization-list">
-                {roles.map((role) => (
-                    <div
-                        className="organization-row"
-                        key={`${role.firstName}-${role.lastName}`}
-                    >
-                        <span>
-                            {role.firstName} {role.lastName}
-                        </span>
+  return (
+    <main className="organization">
+      <h2>Organization</h2>
 
-                        <span>{role.role}</span>
-                    </div>
-                ))}
-            </div>
-        </main>
-    );
+      <div className="organization-list">
+        {roles.map((person) => (
+          <div
+            className="organization-row"
+            key={person.role}
+          >
+            <span>
+              {person.firstName} {person.lastName}
+            </span>
+
+            <span>{person.role}</span>
+          </div>
+        ))}
+      </div>
+
+      <RoleForm onRoleAdded={loadRoles} />
+    </main>
+  );
 }
 
 export default Organization;
