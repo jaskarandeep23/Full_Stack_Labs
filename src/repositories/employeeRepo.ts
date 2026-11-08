@@ -1,36 +1,52 @@
-
 import type { Employee } from "../interfaces/Employee";
 import type { Department } from "../interfaces/Department";
-import departmentsData from "../data/employees.json";
 
-let departments: Department[] = departmentsData;
+const API_URL = "http://localhost:3000/api/employees";
 
 export const employeeRepo = {
-  getDepartments(): Department[] {
-    return departments;
+  async getDepartments(): Promise<Department[]> {
+    const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      throw new Error("Failed to load departments.");
+    }
+
+    return response.json();
   },
 
-  getDepartment(name: string): Department | undefined {
+  async getDepartment(
+    name: string
+  ): Promise<Department | undefined> {
+    const departments = await this.getDepartments();
+
     return departments.find(
       (department) => department.name === name
     );
   },
 
-  createEmployee(
+  async createEmployee(
     departmentName: string,
     employee: Employee
-  ): Department[] {
-    departments = departments.map((department) => {
-      if (department.name === departmentName) {
-        return {
-          ...department,
-          employees: [...department.employees, employee],
-        };
-      }
-
-      return department;
+  ): Promise<void> {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        departmentName,
+        employee,
+      }),
     });
 
-    return departments;
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+
+      throw new Error(
+        result?.firstNameError ||
+        result?.departmentError ||
+        "Failed to create employee."
+      );
+    }
   },
 };
