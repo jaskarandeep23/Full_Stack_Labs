@@ -7,7 +7,7 @@ import "./EmployeeForm.css";
 
 interface EmployeeFormProps {
   departments: Department[];
-  onEmployeeAdded: () => void;
+  onEmployeeAdded: () => void | Promise<void>;
 }
 
 export default function EmployeeForm({
@@ -19,8 +19,11 @@ export default function EmployeeForm({
   const department = useFormInput("");
 
   const [successMessage, setSuccessMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     setSuccessMessage("");
 
@@ -36,24 +39,35 @@ export default function EmployeeForm({
       return;
     }
 
-    const result = employeeService.createEmployee(department.value, {
-      firstName: firstName.value.trim(),
-      lastName: lastName.value.trim(),
-    });
+    setIsSubmitting(true);
 
-    if (!result.success) {
-      firstName.setError(result.firstNameError);
-      department.setError(result.departmentError);
-      return;
+    try {
+      const result = await employeeService.createEmployee(
+        department.value,
+        {
+          firstName: firstName.value.trim(),
+          lastName: lastName.value.trim(),
+        }
+      );
+
+      if (!result.success) {
+        firstName.setError(result.firstNameError);
+        department.setError(result.departmentError);
+        return;
+      }
+
+      setSuccessMessage("Employee added successfully!");
+
+      firstName.reset();
+      lastName.reset();
+      department.reset();
+
+      await onEmployeeAdded();
+    } catch {
+      department.setError("Unable to add employee.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSuccessMessage("Employee added successfully!");
-
-    firstName.reset();
-    lastName.reset();
-    department.reset();
-
-    onEmployeeAdded();
   };
 
   return (
@@ -67,9 +81,13 @@ export default function EmployeeForm({
             id="firstName"
             type="text"
             value={firstName.value}
-            onChange={(event) => firstName.setValue(event.target.value)}
+            onChange={(event) =>
+              firstName.setValue(event.target.value)
+            }
           />
-          {firstName.error && <p className="error">{firstName.error}</p>}
+          {firstName.error && (
+            <p className="error">{firstName.error}</p>
+          )}
         </div>
 
         <div>
@@ -78,9 +96,13 @@ export default function EmployeeForm({
             id="lastName"
             type="text"
             value={lastName.value}
-            onChange={(event) => lastName.setValue(event.target.value)}
+            onChange={(event) =>
+              lastName.setValue(event.target.value)
+            }
           />
-          {lastName.error && <p className="error">{lastName.error}</p>}
+          {lastName.error && (
+            <p className="error">{lastName.error}</p>
+          )}
         </div>
 
         <div>
@@ -88,7 +110,9 @@ export default function EmployeeForm({
           <select
             id="department"
             value={department.value}
-            onChange={(event) => department.setValue(event.target.value)}
+            onChange={(event) =>
+              department.setValue(event.target.value)
+            }
           >
             <option value="">Select Department</option>
             {departments.map((item) => (
@@ -97,10 +121,15 @@ export default function EmployeeForm({
               </option>
             ))}
           </select>
-          {department.error && <p className="error">{department.error}</p>}
+
+          {department.error && (
+            <p className="error">{department.error}</p>
+          )}
         </div>
 
-        <button type="submit">Add Employee</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Adding..." : "Add Employee"}
+        </button>
       </form>
 
       {successMessage && <p>{successMessage}</p>}

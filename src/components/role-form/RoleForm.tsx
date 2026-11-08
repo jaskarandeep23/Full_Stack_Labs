@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { useFormInput } from "../../hooks/useFormInput";
 import { roleService } from "../../services/roleService";
 
 interface RoleFormProps {
-  onRoleAdded: () => void;
+  onRoleAdded: () => void | Promise<void>;
 }
 
 export default function RoleForm({ onRoleAdded }: RoleFormProps) {
@@ -12,8 +13,11 @@ export default function RoleForm({ onRoleAdded }: RoleFormProps) {
   const role = useFormInput("");
 
   const [successMessage, setSuccessMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     setSuccessMessage("");
 
@@ -27,24 +31,33 @@ export default function RoleForm({ onRoleAdded }: RoleFormProps) {
       return;
     }
 
-    const result = roleService.createRole({
-      firstName: firstName.value,
-      lastName: lastName.value,
-      role: role.value,
-    });
+    setIsSubmitting(true);
 
-    if (!result.success) {
-      firstName.setError(result.firstNameError);
-      role.setError(result.roleError);
-      return;
+    try {
+      const result = await roleService.createRole({
+        firstName: firstName.value.trim(),
+        lastName: lastName.value.trim(),
+        role: role.value.trim(),
+      });
+
+      if (!result.success) {
+        firstName.setError(result.firstNameError);
+        role.setError(result.roleError);
+        return;
+      }
+
+      firstName.reset();
+      lastName.reset();
+      role.reset();
+
+      setSuccessMessage("Role added successfully!");
+
+      await onRoleAdded();
+    } catch {
+      role.setError("Unable to add role.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    firstName.reset();
-    lastName.reset();
-    role.reset();
-
-    setSuccessMessage("Role added successfully!");
-    onRoleAdded();
   };
 
   return (
@@ -60,7 +73,9 @@ export default function RoleForm({ onRoleAdded }: RoleFormProps) {
             value={firstName.value}
             onChange={(event) => firstName.setValue(event.target.value)}
           />
-          {firstName.error && <p className="error">{firstName.error}</p>}
+          {firstName.error && (
+            <p className="error">{firstName.error}</p>
+          )}
         </div>
 
         <div>
@@ -71,7 +86,9 @@ export default function RoleForm({ onRoleAdded }: RoleFormProps) {
             value={lastName.value}
             onChange={(event) => lastName.setValue(event.target.value)}
           />
-          {lastName.error && <p className="error">{lastName.error}</p>}
+          {lastName.error && (
+            <p className="error">{lastName.error}</p>
+          )}
         </div>
 
         <div>
@@ -82,10 +99,14 @@ export default function RoleForm({ onRoleAdded }: RoleFormProps) {
             value={role.value}
             onChange={(event) => role.setValue(event.target.value)}
           />
-          {role.error && <p className="error">{role.error}</p>}
+          {role.error && (
+            <p className="error">{role.error}</p>
+          )}
         </div>
 
-        <button type="submit">Add Role</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Adding..." : "Add Role"}
+        </button>
       </form>
 
       {successMessage && <p>{successMessage}</p>}

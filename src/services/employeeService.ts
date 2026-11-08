@@ -2,13 +2,12 @@ import type { Employee } from "../interfaces/Employee";
 import { employeeRepo } from "../repositories/employeeRepo";
 
 export const employeeService = {
-    getDepartments() {
+  async getDepartments() {
     return employeeRepo.getDepartments();
-    },
-    validateDepartment(departmentName: string): string {
-    const department = employeeRepo.getDepartment(departmentName);
+  },
 
-    if (!department) {
+  validateDepartment(departmentName: string): string {
+    if (!departmentName || departmentName.trim() === "") {
       return "Please select a valid department.";
     }
 
@@ -23,7 +22,7 @@ export const employeeService = {
     return "";
   },
 
-  createEmployee(departmentName: string, employee: Employee) {
+  async createEmployee(departmentName: string, employee: Employee) {
     const departmentError = this.validateDepartment(departmentName);
     const firstNameError = this.validateFirstName(employee.firstName);
 
@@ -35,12 +34,21 @@ export const employeeService = {
       };
     }
 
-    employeeRepo.createEmployee(departmentName, employee);
+    try {
+      await employeeRepo.createEmployee(departmentName, employee);
 
-    return {
-      success: true,
-      departmentError: "",
-      firstNameError: "",
-    };
+      return {
+        success: true,
+        departmentError: "",
+        firstNameError: "",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        departmentError:
+          error instanceof Error ? error.message : "Unable to add employee.",
+        firstNameError: "",
+      };
+    }
   },
 };

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -12,39 +11,50 @@ import Organization from "./components/organization/Organization";
 
 function App() {
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [error, setError] = useState("");
 
-  const loadDepartments = () => {
-    setDepartments(employeeService.getDepartments());
+  const loadDepartments = async () => {
+    try {
+      const data = await employeeService.getDepartments();
+      setDepartments(data);
+      setError("");
+    } catch {
+      setError("Unable to load employees from the backend.");
+    }
   };
 
   useEffect(() => {
-    loadDepartments();
+    void loadDepartments();
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route
-          index
-          element={<EmployeeDirectory departments={departments} />}
-        />
+    <>
+      {error && <p className="error">{error}</p>}
 
-        <Route
-          path="add-employee"
-          element={
-            <EmployeeForm
-              departments={departments}
-              onEmployeeAdded={loadDepartments}
-            />
-          }
-        />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route
+            index
+            element={<EmployeeDirectory departments={departments} />}
+          />
 
-        <Route
-          path="organization"
-          element={<Organization />}
-        />
-      </Route>
-    </Routes>
+          <Route
+            path="add-employee"
+            element={
+              <EmployeeForm
+                departments={departments}
+                onEmployeeAdded={loadDepartments}
+              />
+            }
+          />
+
+          <Route
+            path="organization"
+            element={<Organization />}
+          />
+        </Route>
+      </Routes>
+    </>
   );
 }
 
