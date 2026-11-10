@@ -1,14 +1,13 @@
-
 import type { Employee } from "../interfaces/Employee";
 import { employeeRepository } from "../repositories/employeeRepository";
 
 export const employeeService = {
-  getDepartments() {
+  async getDepartments() {
     return employeeRepository.getDepartments();
   },
 
-  validateDepartment(departmentName: string): string {
-    const department = employeeRepository.getDepartment(departmentName);
+  async validateDepartment(departmentName: string): Promise<string> {
+    const department = await employeeRepository.getDepartment(departmentName);
 
     if (!department) {
       return "Please select a valid department.";
@@ -17,7 +16,7 @@ export const employeeService = {
     return "";
   },
 
-  validateFirstName(firstName: string): string {
+  validateFirstName(firstName: unknown): string {
     if (typeof firstName !== "string" || firstName.trim().length < 3) {
       return "First name must be at least 3 characters.";
     }
@@ -25,8 +24,8 @@ export const employeeService = {
     return "";
   },
 
-  createEmployee(departmentName: string, employee: Employee) {
-    const departmentError = this.validateDepartment(departmentName);
+  async createEmployee(departmentName: string, employee: Employee) {
+    const departmentError = await this.validateDepartment(departmentName);
     const firstNameError = this.validateFirstName(employee?.firstName);
 
     if (departmentError || firstNameError) {
@@ -37,7 +36,7 @@ export const employeeService = {
       };
     }
 
-    employeeRepository.createEmployee(departmentName, {
+    await employeeRepository.createEmployee(departmentName, {
       firstName: employee.firstName.trim(),
       lastName:
         typeof employee.lastName === "string"
