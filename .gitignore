@@ -22,3 +22,22 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.env
+.env.*
+!.env.example
+
+# Prisma generated files
+backend/src/generated/
+
+# Prisma assistant configuration
+backend/.agents/
+backend/.claude/
+backend/.cursor/
+backend/.devin/
+
+
+# Generated Prisma seed files
+backend/prisma/seed.js
+backend/prisma/seed.js.map
+backend/prisma/seed.d.ts
+backend/prisma/seed.d.ts.map

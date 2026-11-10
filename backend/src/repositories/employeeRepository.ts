@@ -1,40 +1,56 @@
-
 import type { Employee } from "../interfaces/Employee";
-import type { Department } from "../interfaces/Department";
-import departmentsData from "../data/employees.json";
-
-let departments: Department[] = departmentsData;
+import { prisma } from "../lib/prisma";
 
 export const employeeRepository = {
-  // Get all departments and employees
-  getDepartments(): Department[] {
-    return departments;
+  // Get all departments and their employees
+  async getDepartments() {
+    const departments = await prisma.department.findMany({
+      include: {
+        employees: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
+
+    return departments.map((department) => ({
+      name: department.name,
+      employees: department.employees.map((employee) => ({
+        firstName: employee.firstName,
+        lastName: employee.lastName ?? "",
+      })),
+    }));
   },
 
   // Find a department by name
-  getDepartment(name: string): Department | undefined {
-    return departments.find(
-      (department) => department.name === name
-    );
+  async getDepartment(name: string) {
+    return prisma.department.findUnique({
+      where: { name },
+    });
   },
 
   // Add an employee to a department
-  createEmployee(
+  async createEmployee(
     departmentName: string,
     employee: Employee
-  ): Department[] {
-    departments = departments.map((department) => {
-      if (department.name === departmentName) {
-        return {
-          ...department,
-          employees: [...department.employees, employee],
-        };
-      }
-
-      return department;
+  ) {
+    const department = await prisma.department.findUnique({
+      where: { name: departmentName },
     });
 
-    return departments;
+    if (!department) {
+      throw new Error("Department not found");
+    }
+
+    await prisma.employee.create({
+      data: {
+        firstName: employee.firstName,
+        lastName: employee.lastName ?? "",
+        departmentId: department.id,
+      },
+    });
+
+    return this.getDepartments();
   },
 };
 
