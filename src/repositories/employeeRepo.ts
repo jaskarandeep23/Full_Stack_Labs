@@ -1,7 +1,7 @@
 import type { Employee } from "../interfaces/Employee";
 import type { Department } from "../interfaces/Department";
 
-const API_URL = "http://localhost:3000/api/employees";
+const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/employees`;
 
 export const employeeRepo = {
   async getDepartments(): Promise<Department[]> {
