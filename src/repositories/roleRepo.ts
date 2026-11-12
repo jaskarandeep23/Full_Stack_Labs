@@ -1,7 +1,7 @@
 
 import type { Role } from "../interfaces/Role";
 
-const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/employees`;
+const API_URL = `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/roles`;
 
 export const roleRepo = {
   // Get all organization records from the backend
